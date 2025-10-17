@@ -2,7 +2,7 @@ from colorama import Fore, Style
 from time import sleep
 from os import system
 from sms import SendSms
-from concurrent.futures import ThreadPoolExecutor, wait
+import threading
 
 servisler_sms = []
 for attribute in dir(SendSms):
@@ -15,17 +15,18 @@ for attribute in dir(SendSms):
 while 1:
     system("cls||clear")
     print("""{}
-                                                                                                                                                                       
-888b     d888         .d8888b.                                  888 
-8888b   d8888        d88P  Y88b                                 888 
-88888b.d88888        Y88b.                                      888 
-888Y88888P888888d888  "Y888b.  888  888  888 .d88b. 888d888 .d88888 
-888 Y888P 888888P"       "Y88b.888  888  888d88""88b888P"  d88" 888 
-888  Y8P  888888           "888888  888  888888  888888    888  888 
-888   "   888888  d8bY88b  d88PY88b 888 d88PY88..88P888    Y88b 888 
-888       888888  Y8P "Y8888P"  "Y8888888P"  "Y88P" 888     "Y88888 
     
-    Sms: {}           {}by order {}@Mr-Sword\n  
+888b     d888             .d8888b.                                  888 
+8888b   d8888            d88P  Y88b                                 888 
+88888b.d88888            Y88b.                                      888 
+888Y88888P888888d888      "Y888b.  888  888  888 .d88b. 888d888 .d88888 
+888 Y888P 888888P"           "Y88b.888  888  888d88""88b888P"  d88" 888 
+888  Y8P  888888   888888      "888888  888  888888  888888    888  888 
+888   "   888888         Y88b  d88PY88b 888 d88PY88..88P888    Y88b 888 
+888       888888          "Y8888P"  "Y8888888P"  "Y88P" 888     "Y88888 
+
+    
+    Sms: {}           {}by order {}@Mr-Sword\n
     """.format(Fore.LIGHTCYAN_EX, len(servisler_sms), Style.RESET_ALL, Fore.LIGHTRED_EX))
     try:
         menu = (input(Fore.LIGHTMAGENTA_EX + " 1- SMS Gönder (Normal)\n\n 2- SMS Gönder (Turbo)\n\n 3- Çıkış\n\n" + Fore.LIGHTYELLOW_EX + " Seçim: "))
@@ -156,62 +157,20 @@ while 1:
             continue
         system("cls||clear")
         send_sms = SendSms(tel_no, mail)
+        dur = threading.Event()
+        def Turbo():
+            while not dur.is_set():
+                thread = []
+                for fonk in servisler_sms:
+                    t = threading.Thread(target=getattr(send_sms, fonk), daemon=True)
+                    thread.append(t)
+                    t.start()
+                for t in thread:
+                    t.join()
         try:
-            while True:
-                with ThreadPoolExecutor() as executor:
-                    futures = [
-                        executor.submit(send_sms.Akasya),
-                        executor.submit(send_sms.Akbati),
-                        executor.submit(send_sms.Ayyildiz),
-                        executor.submit(send_sms.Baydoner),
-                        executor.submit(send_sms.Beefull),
-                        executor.submit(send_sms.Bim),
-                        executor.submit(send_sms.Bisu),
-                        executor.submit(send_sms.Bodrum),
-                        executor.submit(send_sms.Clickme),
-                        executor.submit(send_sms.Dominos),
-                        executor.submit(send_sms.Englishhome),
-                        executor.submit(send_sms.Evidea),
-                        executor.submit(send_sms.File),
-                        executor.submit(send_sms.Frink),
-                        executor.submit(send_sms.Happy),
-                        executor.submit(send_sms.Hayatsu),
-                        executor.submit(send_sms.Hey),
-                        executor.submit(send_sms.Hizliecza),
-                        executor.submit(send_sms.Icq),
-                        executor.submit(send_sms.Ipragaz),
-                        executor.submit(send_sms.Istegelsin),
-                        executor.submit(send_sms.Joker),
-                        executor.submit(send_sms.KahveDunyasi),
-                        executor.submit(send_sms.KimGb),
-                        executor.submit(send_sms.Komagene),
-                        executor.submit(send_sms.Koton),
-                        executor.submit(send_sms.KuryemGelsin),
-                        executor.submit(send_sms.Macro),
-                        executor.submit(send_sms.Metro),
-                        executor.submit(send_sms.Migros),
-                        executor.submit(send_sms.Naosstars),
-                        executor.submit(send_sms.Paybol),
-                        executor.submit(send_sms.Pidem),
-                        executor.submit(send_sms.Porty),
-                        executor.submit(send_sms.Qumpara),
-                        executor.submit(send_sms.Starbucks),
-                        executor.submit(send_sms.Suiste),
-                        executor.submit(send_sms.Taksim),
-                        executor.submit(send_sms.Tasdelen),
-                        executor.submit(send_sms.Tasimacim),
-                        executor.submit(send_sms.Tazi),
-                        executor.submit(send_sms.TiklaGelsin),
-                        executor.submit(send_sms.ToptanTeslim),
-                        executor.submit(send_sms.Ucdortbes),
-                        executor.submit(send_sms.Uysal),
-                        executor.submit(send_sms.Wmf),
-                        executor.submit(send_sms.Yapp),
-                        executor.submit(send_sms.YilmazTicaret),
-                        executor.submit(send_sms.Yuffi)
-                    ]
-                    wait(futures)
+            Turbo()
         except KeyboardInterrupt:
+            dur.set()
             system("cls||clear")
             print("\nCtrl+C tuş kombinasyonu algılandı. Menüye dönülüyor..")
             sleep(2)
